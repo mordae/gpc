@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>CSV&rarr;GPC</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/css/style.css">
+ </head>
+ <body>
+  <div class="container">
+   <h1>CSV&rarr;GPC</h1>
+
+   {% for message in get_flashed_messages('main') %}
+   <div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>Chyba:</strong> {{ message[1] }}
+   </div>
+   {% endfor %}
+
+  <div class="row">
+   <div class="col-md-6">
+    <p>Tento nástroj slouží k převodu souborů bankovních výpisů z formátu CSV
+       jednotlivých on-line bankovnictví do formátu GPC společného pro většinu
+       účetního software.</p>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="csv">Soubor s výpisem</label>
+        <input type="file" name="csv" id="csv" />
+        <p class="help-block">Datový soubor ve formátu CSV.</p>
+      </div>
+      <button type="submit" class="btn btn-primary">Zpracovat</button>
+    </form>
+   </div>
+  </div>
+
+  <script src="//code.jquery.com/jquery-1.11.3.min.js" integrity="sha512-xAERw8wHVOkM9x9y9/FvQ7g1t+gIQj39mfkN1Rd1OLcC5k/x2e6NO8hq6qEbb3oO+CYYTjVLFiFYg5/7ddF0zA==" crossorigin="anonymous"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+ </body>
+</html>
+<!-- vim:set sw=1 ts=1 et: -->

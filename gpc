@@ -1,0 +1,79 @@
+#!/usr/bin/python -tt
+# -*- coding: utf-8 -*-
+
+# Twisted hosts our website and helps with async development.
+from twisted.internet import reactor
+from twisted.web.server import Site
+from twisted.web.wsgi import WSGIResource
+
+# Command line arguments follow the GNU conventions.
+from getopt import gnu_getopt
+from sys import argv
+
+# Configuration is stored in a boring ini file.
+from ConfigParser import ConfigParser
+
+# The application itself also comes in handy... ;-)
+from mordae.gpc import *
+
+
+if __name__ == '__main__':
+    def do_start(config):
+        # Prepare manager, it takes care of caching.
+        manager = Manager()
+
+        # Prepare the application.
+        app = make_website_app(manager, config.getboolean('http', 'debug'))
+
+        # Workaround for RHEL6 Twisted.
+        reactor.suggestThreadPoolSize(5)
+
+        # Prepare WSGI site.
+        site = Site(WSGIResource(reactor, reactor.threadpool, app))
+
+        # Bind the website to it's address.
+        reactor.listenTCP(config.getint('http', 'port'), site,
+                          interface=config.get('http', 'host'))
+
+        # Run twisted.
+        reactor.run()
+
+
+    def do_help(*args, **kwargs):
+        print 'Usage: gpc [--config=/etc/gpc.ini]'
+        print 'Runs gpc daemon with given configuration.'
+        print ''
+        print 'OPTIONS:'
+        print '  --help, -h          Display this help.'
+        print '  --version, -V       Display version info.'
+        print ''
+        print '  --config, -c file   Load alternative configuration file.'
+        print '                      Defaults to /etc/gpc.ini.'
+        print ''
+        print 'Report bugs at <info@singularita.net>.'
+
+    def do_version(*args, **kwargs):
+        print 'gpc (Mordae) 1'
+
+    # Parse command line arguments.
+    opts, args = gnu_getopt(argv, 'hVc:', ['help', 'version', 'config='])
+
+    action = do_start
+    config_path = '/etc/gpc.ini'
+
+    for k, v in opts:
+        if k in ('--help', '-h'):
+            action = do_help
+        elif k in ('--version', '-V'):
+            action = do_version
+        elif k in ('--config', '-c'):
+            config_path = v
+
+    # Load the configuration from file.
+    config = ConfigParser()
+    config.read(config_path)
+
+    # Perform the selected action.
+    action(config=config)
+
+# vim:set sw=4 ts=4 et:

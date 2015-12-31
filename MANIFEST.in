@@ -1,0 +1,2 @@
+include mordae/gpc/templates/*.html
+include mordae/gpc/static/*/*
