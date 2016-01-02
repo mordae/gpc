@@ -30,7 +30,7 @@ def make_website_app(manager, debug):
 
 
     @app.route('/upload', methods=['POST'])
-    def pick_column():
+    def upload():
         if 'csv' not in flask.request.files:
             flask.flash(u'Nevybrali jste žádný soubor!')
             return flask.redirect('/')
@@ -43,7 +43,7 @@ def make_website_app(manager, debug):
             return flask.redirect('/')
 
         name = blockingCallFromThread(reactor, manager.store_input, inp, keep=1800)
-        account = '1234567890/9999'
+        account = '%016d/%04d' % (inp.account, inp.bank)
         sequence = 0
 
         return flask.render_template('preview.html', **locals())
