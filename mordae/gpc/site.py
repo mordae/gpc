@@ -72,7 +72,7 @@ def make_website_app(manager, debug):
             return flask.render_template('preview.html', **locals())
 
         if not re.match('^[0-9]+(-[0-9]+)?/[0-9]+$', account):
-            flask.flask(u'Neplatné číslo účtu. Zkuste to znovu.')
+            flask.flash(u'Neplatné číslo účtu. Zkuste to znovu.')
             return flask.render_template('preview.html', **locals())
 
         try:
