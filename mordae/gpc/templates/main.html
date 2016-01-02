@@ -21,14 +21,20 @@
     <p>Tento nástroj slouží k převodu souborů bankovních výpisů z formátu CSV
        jednotlivých on-line bankovnictví do formátu GPC společného pro většinu
        účetního software.</p>
+   </div>
+  </div>
 
+  <div class="row">
+   <div class="col-md-6">
     <form action="/upload" method="post" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="csv">Soubor s výpisem</label>
-        <input type="file" name="csv" id="csv" />
-        <p class="help-block">Datový soubor ve formátu CSV.</p>
+     <div class="form-group">
+      <div class="input-group">
+       <label class="input-group-addon" for="csv">Soubor s výpisem:</label>
+       <input type="file" name="csv" id="csv" class="form-control" />
       </div>
-      <button type="submit" class="btn btn-primary">Zpracovat</button>
+      <p class="help-block">Datový soubor ve formátu CSV.</p>
+     </div>
+     <button type="submit" class="btn btn-primary">Zpracovat</button>
     </form>
    </div>
   </div>

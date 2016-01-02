@@ -17,23 +17,37 @@
    {% endfor %}
 
    <form action="/process" method="post">
-    <div class="form-group">
-     <label for="account">Číslo účtu:</label>
-     <input type="text" name="account" id="account" value="{{account}}" />
-     <p class="help-block">Doplňte nebo opravte číslo účtu, ke kterému se tento
-                           výpis vztahuje. Předčíslí oddělte pomlčkou a kód banky
-                           uveďte za lomítkem.</p>
+    <div class="row">
+     <div class="col-md-6">
+      <div class="form-group">
+       <div class="input-group">
+        <label for="account" class="input-group-addon">Číslo účtu:</label>
+        <input type="text" name="account" id="account" value="{{account}}" class="form-control" />
+       </div>
+       <p class="help-block">
+        Doplňte nebo opravte číslo účtu, ke kterému se tento výpis vztahuje.
+        Předčíslí oddělte pomlčkou a kód banky uveďte za lomítkem.</p>
+      </div>
+     </div>
+     <div class="col-md-6">
+      <div class="form-group">
+       <div class="input-group">
+        <label for="sequence" class="input-group-addon">Pořadí:</label>
+        <input type="text" name="sequence" id="sequence" value="{{sequence}}" class="form-control" />
+       </div>
+       <p class="help-block">Počáteční pořadové číslo pro skupiny pohybů.
+                             Mělo by navazovat na předcházející importy ve
+                             Vašem účetním software.</p>
+      </div>
+     </div>
     </div>
-    <div class="form-group">
-     <label for="sequence">Pořadí:</label>
-     <input type="text" name="sequence" id="sequence" value="{{sequence}}" />
-     <p class="help-block">Počáteční pořadové číslo pro skupiny pohybů.
-                           Mělo by navazovat na předcházející importy ve
-                           Vašem účetním software.</p>
+    <div class="row">
+     <div class="col-md-12">
+      <input type="hidden" name="name" id="name" value="{{name}}">
+      <button type="submit" class="btn btn-primary">Zpracovat</button>
+      <a class="btn btn-default" href="/">Zpět</a>
+     </div>
     </div>
-    <input type="hidden" name="name" id="name" value="{{name}}">
-    <button type="submit" class="btn btn-primary">Zpracovat</button>
-    <a class="btn btn-default" href="/">Zpět</a>
    </form>
 
    <table class="table table-striped csv-table">
