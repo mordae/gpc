@@ -10,7 +10,7 @@ setup(
     name = 'gpc',
     version = '1',
     author = 'Mordae',
-    description = ('CSV To GPC Conversion Web Service'),
+    description = ('CSV, TXT To GPC Conversion Web Service'),
     license = 'MIT',
     keywords = 'csv gpc',
     url = 'http://gpc.mordae.eu/',
