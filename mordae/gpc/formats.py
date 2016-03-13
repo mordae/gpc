@@ -81,7 +81,9 @@ class Input(object):
 
 
 class Record(object):
-    def __init__(self, datum, valuta='', poznamka='', nazev_protiuctu='', cislo_protiuctu='', castka=0, poplatek=0, typ='', zprava='', vs=0, ks=0, ss=0):
+    def __init__(self, datum, valuta='', poznamka='', nazev_protiuctu='',
+                 cislo_protiuctu='', castka=0, poplatek=0, typ='', zprava='',
+                 vs=0, ks=0, ss=0):
         if not valuta:
             valuta = datum
 
@@ -132,7 +134,9 @@ class Record(object):
 
 class RB_Record(Record):
     def __init__(self, rec):
-        datum, cas, poznamka, nazev_protiuctu, cislo_protiuctu, datum_odepsani, valuta, typ, transakce, vs, ks, ss, castka, poplatek, smena, zprava = rec
+        datum, cas, poznamka, nazev_protiuctu, cislo_protiuctu, \
+            datum_odepsani, valuta, typ, transakce, vs, ks, ss, \
+            castka, poplatek, smena, zprava = rec
 
         self.datum = tuple(int(x) for x in datum.split(u'.'))
         self.valuta = tuple(int(x) for x in valuta.split(u'.'))

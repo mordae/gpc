@@ -10,13 +10,13 @@ from uuid import uuid4
 
 __all__ = ['Manager']
 
+
 class Manager(object):
     """Persistent application logic."""
 
     def __init__(self):
         """Prepare the input store."""
         self.inputs = {}
-
 
     def store_input(self, inp, keep=600):
         """Store input for given period of time under a generated name."""
@@ -28,10 +28,8 @@ class Manager(object):
 
         return name
 
-
     def get_input(self, name):
         return self.inputs.get(name)
-
 
     def discard_input(self, name):
         try:
