@@ -16,6 +16,7 @@ import re
 
 __all__ = ['make_website_app']
 
+
 def make_website_app(manager, debug):
     """Construct website WSGI application."""
 
@@ -28,7 +29,6 @@ def make_website_app(manager, debug):
     def index():
         return flask.render_template('main.html')
 
-
     @app.route('/upload', methods=['POST'])
     def upload():
         if 'csv' not in flask.request.files:
@@ -40,6 +40,11 @@ def make_website_app(manager, debug):
         except:
             print_exc()
             flask.flash(u'Nepodařilo se zpracovat vstupní soubor.')
+            return flask.redirect('/')
+
+        if 0 == len(inp.records):
+            flask.flash(u'Soubor neobsahuje žádné platné záznamy. '
+                        u'Nahrajte prosím soubor s pohyby na účtu.')
             return flask.redirect('/')
 
         name = blockingCallFromThread(reactor, manager.store_input, inp, keep=1800)
@@ -62,7 +67,8 @@ def make_website_app(manager, debug):
 
         inp = blockingCallFromThread(reactor, manager.get_input, name)
         if inp is None:
-            flask.flash(u'Jejda, vstupní soubor tu už není. Příště zkuste doplnit chybějící informace rychleji...')
+            flask.flash(u'Jejda, vstupní soubor tu už není. '
+                        u'Příště zkuste doplnit chybějící informace rychleji.')
             return flask.redirect('/')
 
         try:
@@ -88,7 +94,6 @@ def make_website_app(manager, debug):
         resp.headers['Content-Type'] = 'application/octet-stream'
         resp.headers['Content-Disposition'] = 'attachment; filename=account.gpc'
         return resp
-
 
     return app
 
