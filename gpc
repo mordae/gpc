@@ -5,10 +5,11 @@
 from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
+from twisted.python import log
 
 # Command line arguments follow the GNU conventions.
 from getopt import gnu_getopt
-from sys import argv
+from sys import argv, stderr
 
 # Configuration is stored in a boring ini file.
 from ConfigParser import ConfigParser
@@ -19,6 +20,9 @@ from mordae.gpc import *
 
 if __name__ == '__main__':
     def do_start(config):
+        # Start Twisted logging to console.
+        log.startLogging(stderr)
+
         # Prepare manager, it takes care of caching.
         manager = Manager()
 
