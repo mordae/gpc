@@ -13,6 +13,11 @@ def parse_input(fp):
     if not lines:
         return Input(0, 0, [])
 
+    if 'Pohyby na úètù' in lines[0]:
+        lines[0] = lines[0][3:]
+        lines = [line.decode('windows-1250').rstrip() for line in lines]
+        return parse_csob(lines)
+
     if 'Pohyby na účtu' in lines[0]:
         lines[0] = lines[0][3:]
         lines = [line.decode('utf8').rstrip() for line in lines]
