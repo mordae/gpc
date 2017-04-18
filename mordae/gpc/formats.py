@@ -226,7 +226,7 @@ class Group(object):
         acc, bank = split_account(account)
 
         # For the output below.
-        date = records[-1].datum
+        date = records[-1].valuta
 
         # Date for the header record.
         fields = [
