@@ -81,14 +81,11 @@ class Input(object):
 
 
 class Record(object):
-    def __init__(self, datum, valuta='', poznamka='', nazev_protiuctu='',
-                 cislo_protiuctu='', castka=0, poplatek=0, typ='', zprava='',
+    def __init__(self, datum, poznamka='',
+                 nazev_protiuctu='', cislo_protiuctu='',
+                 castka=0, poplatek=0, typ='', zprava='',
                  vs=0, ks=0, ss=0):
-        if not valuta:
-            valuta = datum
-
         self.datum = datum
-        self.valuta = valuta
         self.poznamka = poznamka
         self.nazev_protiuctu = nazev_protiuctu
         self.cislo_protiuctu = cislo_protiuctu
@@ -103,9 +100,6 @@ class Record(object):
     def render(self, fp, account):
         d, m, y = self.datum
         datum = '%02d%02d%02d' % (d, m, y - 2000)
-
-        d, m, y = self.valuta
-        valuta = '%02d%02d%02d' % (d, m, y - 2000)
 
         our_acc, our_bank = split_account(account)
         peer_acc, peer_bank = split_account(self.cislo_protiuctu)
@@ -122,7 +116,7 @@ class Record(object):
             '%010d' % self.vs,
             '00%04d%04d' % (peer_bank, self.ks),
             '%010d' % self.ss,
-            valuta,
+            datum,
             '%-20s' % poznamka[:20].encode('windows-1250'),
             '0',
             '0203',
@@ -135,11 +129,10 @@ class Record(object):
 class RB_Record(Record):
     def __init__(self, rec):
         datum, cas, poznamka, nazev_protiuctu, cislo_protiuctu, \
-            datum_odepsani, valuta, typ, transakce, vs, ks, ss, \
+            datum_odepsani, _valuta, typ, transakce, vs, ks, ss, \
             castka, poplatek, smena, zprava = rec
 
-        self.datum = tuple(int(x) for x in datum.split(u'.'))
-        self.valuta = tuple(int(x) for x in valuta.split(u'.'))
+        self.datum = tuple(int(x) for x in datum_odepsani.split(u'.'))
 
         self.poznamka = poznamka
         self.nazev_protiuctu = nazev_protiuctu
@@ -170,7 +163,6 @@ class CSOB_Record(Record):
         datum = data[u'datum zaúčtování']
 
         self.datum = tuple(int(x) for x in datum.split(u'.'))
-        self.valuta = self.datum
 
         self.nazev_protiuctu = data[u'název protiúčtu']
         self.cislo_protiuctu = data[u'protiúčet']
@@ -226,7 +218,7 @@ class Group(object):
         acc, bank = split_account(account)
 
         # For the output below.
-        date = records[-1].valuta
+        date = records[-1].datum
 
         # Date for the header record.
         fields = [
@@ -267,7 +259,7 @@ class Set(object):
         self.groups = {}
 
     def add_record(self, rec):
-        self.groups.setdefault(rec.valuta, Group()).add_record(rec)
+        self.groups.setdefault(rec.datum, Group()).add_record(rec)
 
     def render(self, fp, account, sequence):
         for i, date in enumerate(sorted(self.groups, key=xreversed)):
