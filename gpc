@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/python3 -tt
 # -*- coding: utf-8 -*-
 
 # Twisted hosts our website and helps with async development.
@@ -12,7 +12,7 @@ from getopt import gnu_getopt
 from sys import argv, stderr
 
 # Configuration is stored in a boring ini file.
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 # The application itself also comes in handy... ;-)
 from mordae.gpc import *
@@ -44,20 +44,20 @@ if __name__ == '__main__':
 
 
     def do_help(*args, **kwargs):
-        print 'Usage: gpc [--config=/etc/gpc.ini]'
-        print 'Runs gpc daemon with given configuration.'
-        print ''
-        print 'OPTIONS:'
-        print '  --help, -h          Display this help.'
-        print '  --version, -V       Display version info.'
-        print ''
-        print '  --config, -c file   Load alternative configuration file.'
-        print '                      Defaults to /etc/gpc.ini.'
-        print ''
-        print 'Report bugs at <info@singularita.net>.'
+        print('Usage: gpc [--config=/etc/gpc.ini]')
+        print('Runs gpc daemon with given configuration.')
+        print('')
+        print('OPTIONS:')
+        print('  --help, -h          Display this help.')
+        print('  --version, -V       Display version info.')
+        print('')
+        print('  --config, -c file   Load alternative configuration file.')
+        print('                      Defaults to /etc/gpc.ini.')
+        print('')
+        print('Report bugs at <info@singularita.net>.')
 
     def do_version(*args, **kwargs):
-        print 'gpc (Mordae) 1'
+        print('gpc (Mordae) 1')
 
     # Parse command line arguments.
     opts, args = gnu_getopt(argv, 'hVc:', ['help', 'version', 'config='])

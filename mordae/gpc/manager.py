@@ -1,8 +1,6 @@
 #!/usr/bin/python -tt
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-
 from twisted.internet.threads import deferToThread
 from twisted.internet import task, reactor
 

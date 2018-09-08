@@ -1,8 +1,6 @@
 #!/usr/bin/python -tt
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, division, print_function
-
 import csv
 import re
 
@@ -13,17 +11,18 @@ def parse_input(fp):
     if not lines:
         return Input(0, 0, [])
 
-    if 'Pohyby na úètù' in lines[0]:
+    if b'Pohyby na \xfa\xe8tu' in lines[0]:
         lines[0] = lines[0][3:]
         lines = [line.decode('windows-1250').rstrip() for line in lines]
         return parse_csob(lines)
 
-    if 'Pohyby na účtu' in lines[0]:
+    if b'Pohyby na \xc3\xba\xc4\x8dtu' in lines[0]:
         lines[0] = lines[0][3:]
         lines = [line.decode('utf8').rstrip() for line in lines]
         return parse_csob(lines)
 
-    if 'DATUM ODEPS\xc1N\xcd' in lines[0]:
+    if b'Datum za\xfa\xe8tov\xe1n\xed' in lines[0]:
+        lines = [line.decode('windows-1250').rstrip() for line in lines]
         return parse_rb(lines[1:])
 
     return Input(0, 0, [])
@@ -31,28 +30,29 @@ def parse_input(fp):
 
 def parse_rb(lines):
     input_records = list(csv.reader(lines, delimiter=';'))
-
-    for record in input_records:
-        for index, field in enumerate(record):
-            record[index] = field.decode('windows-1250')
-
     rb_records = [RB_Record(rec) for rec in input_records]
-    return Input(0, 5500, rb_records)
+
+    if len(input_records) > 0:
+        accno = int(input_records[0][2].split('/')[0])
+    else:
+        accno = 0
+
+    return Input(accno, 5500, rb_records)
 
 
 def parse_csob(lines):
-    account = re.match(u'.*: ([0-9-]+)', lines[0]).group(1)
+    account = re.match('.*: ([0-9-]+)', lines[0]).group(1)
 
-    input_records = u'\n'.join(lines[2:]).split('\n\n')
-    input_records = filter(lambda r: r.strip(), input_records)
+    input_records = '\n'.join(lines[2:]).split('\n\n')
+    input_records = [r for r in input_records if r.strip()]
     csob_records = []
 
     for i, rec in enumerate(input_records):
         data = {}
 
-        rec = re.sub(u'\n +', u'\nzpráva: ', rec.strip())
+        rec = re.sub('\n +', '\nzpráva: ', rec.strip())
 
-        for row in rec.strip().split(u'\n'):
+        for row in rec.strip().split('\n'):
             key, value = row.split(':', 1)
             data[key.strip()] = value.strip()
 
@@ -128,13 +128,14 @@ class Record(object):
 
 class RB_Record(Record):
     def __init__(self, rec):
-        datum, cas, poznamka, nazev_protiuctu, cislo_protiuctu, \
-            datum_odepsani, _valuta, typ, transakce, vs, ks, ss, \
-            castka, poplatek, smena, zprava = rec
+        datum, _datum_zauctovani, _cislo_uctu, _nazev_uctu, \
+            _kategorie, cislo_protiuctu, nazev_protiuctu, typ, \
+            zprava, poznamka, vs, ks, ss, castka, mena, smena1, smena2, \
+            poplatek, transakce = rec
 
-        self.datum = tuple(int(x) for x in datum_odepsani.split(u'.'))
+        self.datum = tuple(int(x) for x in datum.split('.'))
 
-        self.poznamka = poznamka
+        self.poznamka = re.sub(r'\s*\d+[,.]\d+\s*\(poplatek[^)]*\)\s*', '', poznamka)
         self.nazev_protiuctu = nazev_protiuctu
         self.cislo_protiuctu = cislo_protiuctu
 
@@ -160,23 +161,23 @@ class RB_Record(Record):
 
 class CSOB_Record(Record):
     def __init__(self, data):
-        datum = data[u'datum zaúčtování']
+        datum = data['datum zaúčtování']
 
-        self.datum = tuple(int(x) for x in datum.split(u'.'))
+        self.datum = tuple(int(x) for x in datum.split('.'))
 
-        self.nazev_protiuctu = data[u'název protiúčtu']
-        self.cislo_protiuctu = data[u'protiúčet']
+        self.nazev_protiuctu = data['název protiúčtu']
+        self.cislo_protiuctu = data['protiúčet']
 
-        self.castka = int(100 * float(data[u'částka']))
+        self.castka = int(100 * float(data['částka']))
         self.poplatek = 0
 
-        self.typ = data[u'označení operace']
-        self.zprava = data.get(u'zpráva', '')
-        self.poznamka = data[u'poznámka']
+        self.typ = data['označení operace']
+        self.zprava = data.get('zpráva', '')
+        self.poznamka = data['poznámka']
 
-        self.vs = int(data[u'variabilní symbol'] or '0')
-        self.ks = int(data[u'konstantní symbol'] or '0')
-        self.ss = int(data[u'specifický symbol'] or '0')
+        self.vs = int(data['variabilní symbol'] or '0')
+        self.ks = int(data['konstantní symbol'] or '0')
+        self.ss = int(data['specifický symbol'] or '0')
 
     def __repr__(self):
         return '<CSOB_Record %s>' % (self.__dict__,)
@@ -203,7 +204,7 @@ class Group(object):
 
         # Create a sythetic record for fees only if non-zero.
         if fees:
-            fr = Record(datum=fee_date, castka=fees, cislo_protiuctu=account, typ=u'Poplatky')
+            fr = Record(datum=fee_date, castka=fees, cislo_protiuctu=account, typ='Poplatky')
             records.append(fr)
 
         # Abort if we have no records.
@@ -244,7 +245,7 @@ def split_account(acc):
     if not acc:
         return 0, 0
 
-    m = re.match(u'^((\d+)-)?(\d+)/(\d+)$', acc)
+    m = re.match('^((\d+)-)?(\d+)/(\d+)$', acc)
     acc = int('%06d%010d' % (int(m.group(2) or 0), int(m.group(3))))
     bank = int(m.group(4))
     return acc, bank

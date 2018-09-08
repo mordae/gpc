@@ -1,10 +1,8 @@
 #!/usr/bin/python -tt
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-
 from traceback import print_exc
-from cStringIO import StringIO
+from io import StringIO
 from twisted.internet import reactor
 from twisted.internet.threads import blockingCallFromThread
 
@@ -32,19 +30,19 @@ def make_website_app(manager, debug):
     @app.route('/upload', methods=['POST'])
     def upload():
         if 'csv' not in flask.request.files:
-            flask.flash(u'Nevybrali jste žádný soubor!')
+            flask.flash('Nevybrali jste žádný soubor!')
             return flask.redirect('/')
 
         try:
             inp = parse_input(flask.request.files['csv'])
         except:
             print_exc()
-            flask.flash(u'Nepodařilo se zpracovat vstupní soubor.')
+            flask.flash('Nepodařilo se zpracovat vstupní soubor.')
             return flask.redirect('/')
 
         if 0 == len(inp.records):
-            flask.flash(u'Soubor neobsahuje žádné platné záznamy. '
-                        u'Nahrajte prosím soubor s pohyby na účtu.')
+            flask.flash('Soubor neobsahuje žádné platné záznamy. '
+                        'Nahrajte prosím soubor s pohyby na účtu.')
             return flask.redirect('/')
 
         name = blockingCallFromThread(reactor, manager.store_input, inp, keep=1800)
@@ -58,7 +56,7 @@ def make_website_app(manager, debug):
         if 'name' not in flask.request.form or \
            'account' not in flask.request.form or \
            'sequence' not in flask.request.form:
-            flask.flash(u'Co to proboha provádíte?!')
+            flask.flash('Co to proboha provádíte?!')
             return flask.redirect('/')
 
         name = flask.request.form['name']
@@ -67,18 +65,18 @@ def make_website_app(manager, debug):
 
         inp = blockingCallFromThread(reactor, manager.get_input, name)
         if inp is None:
-            flask.flash(u'Jejda, vstupní soubor tu už není. '
-                        u'Příště zkuste doplnit chybějící informace rychleji.')
+            flask.flash('Jejda, vstupní soubor tu už není. '
+                        'Příště zkuste doplnit chybějící informace rychleji.')
             return flask.redirect('/')
 
         try:
             sequence = int(flask.request.form['sequence'])
         except ValueError:
-            flask.flash(u'Neplatné pořadové číslo. Zkuste to znovu.')
+            flask.flash('Neplatné pořadové číslo. Zkuste to znovu.')
             return flask.render_template('preview.html', **locals())
 
         if not re.match('^[0-9]+(-[0-9]+)?/[0-9]+$', account):
-            flask.flash(u'Neplatné číslo účtu. Zkuste to znovu.')
+            flask.flash('Neplatné číslo účtu. Zkuste to znovu.')
             return flask.render_template('preview.html', **locals())
 
         try:
@@ -87,7 +85,7 @@ def make_website_app(manager, debug):
             data = fp.getvalue()
         except:
             print_exc()
-            flask.flash(u'Nastala chyba při zpracování souboru. Omlouváme se.')
+            flask.flash('Nastala chyba při zpracování souboru. Omlouváme se.')
             return flask.redirect('/')
 
         resp = flask.make_response(data)

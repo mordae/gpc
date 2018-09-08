@@ -1,8 +1,6 @@
 #!/usr/bin/python -tt
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-
 from setuptools import setup
 import os.path
 
