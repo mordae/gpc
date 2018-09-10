@@ -146,7 +146,7 @@ class RB_Record(Record):
         self.castka = castka
 
         poplatek = int(100 * float(poplatek.replace(',', '.').replace(' ', '')))
-        self.poplatek = poplatek
+        self.poplatek = -1 * poplatek
 
         self.typ = typ
         self.zprava = zprava
